@@ -1,0 +1,19 @@
+{
+  "name": "local-mail-sender",
+  "version": "1.0.0",
+  "description": "This Projet Is Created by Himanshu Jha For The Education Perpouse",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "Email",
+    "sender"
+  ],
+  "author": "HImanshu Jha",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.21.2",
+    "nodemailer": "^6.9.16"
+  }
+}
