@@ -1,7 +1,7 @@
 const express = require('express');
 const nodemailer = require('nodemailer');
 const fs = require('fs');
-// require('dotenv').config(); // Load environment variables from `.env`
+const csv = require('csv-parser'); // Import csv-parser to handle CSV files
 
 const app = express();
 const PORT = 3000;
@@ -10,15 +10,24 @@ const PORT = 3000;
 const startIndex = 0; // Starting index
 const endIndex = 100; // Ending index (exclusive)
 
-// Load user email list
-const users = JSON.parse(fs.readFileSync('file.json', 'utf-8'));
+// Load user email list from a CSV file
+const users = [];
+fs.createReadStream('file.csv') // Replace 'file.csv' with the path to your CSV file
+  .pipe(csv())
+  .on('data', (row) => {
+    users.push(row);
+  })
+  .on('end', () => {
+    console.log('CSV file successfully processed');
+    startServer(); // Start the server after loading CSV data
+  });
 
 // Configure Nodemailer
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'enter your mail', // Your Gmail address
-    pass: ' app password ', // Your Gmail app password 
+    user: ' ', // Your Gmail address
+    pass: ' ', // Your Gmail app password
   },
 });
 
@@ -59,10 +68,10 @@ const sendEmail = async (user) => {
     `;
 
     const mailOptions = {
-      from: `"Name Of The Mail" <Enter Your Email Address>`, // Sender address
+      from: `"Enter Your NAme  " <Enter Your Email>`,
       to: user.email, // Receiver email
-      subject: '📊 Enter Your Subject 📹', // Subject line 
-      html: emailContent, // HTML body content
+      subject: '   ',
+      html: emailContent,
     };
 
     await transporter.sendMail(mailOptions);
@@ -74,7 +83,7 @@ const sendEmail = async (user) => {
 
 // Function to send emails in sequence
 const sendEmails = () => {
-  let index = startIndex; // Set the starting index
+  let index = startIndex;
   const sendNextEmail = () => {
     if (index < endIndex && index < users.length) {
       sendEmail(users[index]);
@@ -87,8 +96,10 @@ const sendEmails = () => {
   sendNextEmail();
 };
 
-// Automatically start sending emails when the server starts
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-  sendEmails(); // Start sending emails automatically
-});
+// Start the server after loading the CSV data
+const startServer = () => {
+  app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
+    sendEmails(); // Start sending emails automatically
+  });
+};
